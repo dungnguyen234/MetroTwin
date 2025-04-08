@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
@@ -10,6 +10,7 @@ export default function App() {
   const [currentStation, setCurrentStation] = useState('');
   const [nextStation, setNextStation] = useState(stations[1]);
   const [status, setStatus] = useState(['OK', 'OK', 'OK', 'OK']);
+  const lastAnnouncedIndex = useRef(-1);
 
   const speak = (text) => {
     const utter = new SpeechSynthesisUtterance(text);
@@ -23,7 +24,7 @@ export default function App() {
 
   useEffect(() => {
     const handleVoiceInit = () => {
-      window.speechSynthesis.getVoices(); // load voices
+      window.speechSynthesis.getVoices(); // preload voices
     };
     window.speechSynthesis.onvoiceschanged = handleVoiceInit;
     handleVoiceInit();
@@ -32,17 +33,19 @@ export default function App() {
       const newSpeed = 80 + Math.floor(Math.random() * 20);
       setSpeed(newSpeed);
       setPosition((prev) => {
-        const newPos = prev + newSpeed / 60;
+        const newPos = Math.min(prev + newSpeed / 60, 100);
         const segment = 100 / (stations.length - 1);
         const index = Math.floor(newPos / segment);
-        if (index !== stations.indexOf(currentStation) && index < stations.length) {
+
+        if (index !== lastAnnouncedIndex.current && index < stations.length) {
           const curr = stations[index];
           const next = stations[index + 1] || 'Hết tuyến';
           setCurrentStation(curr);
           setNextStation(next);
           speak(`Đã tới ga ${curr}. Ga tiếp theo: ${next}`);
+          lastAnnouncedIndex.current = index;
         }
-        return Math.min(newPos, 100);
+        return newPos;
       });
 
       setStatus((prev) =>
