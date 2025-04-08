@@ -1,13 +1,10 @@
-
-import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const stations = ['Bến Thành', 'Ba Son', 'Văn Thánh', 'Thảo Điền', 'Suối Tiên']
 
 export default function App() {
   const [position, setPosition] = useState(0)
-  const [speed, setSpeed] = useState(80)
+  const [speed, setSpeed] = useState(90)
   const [currentStation, setCurrentStation] = useState('')
   const [nextStation, setNextStation] = useState(stations[1])
   const [status, setStatus] = useState(['OK', 'OK', 'OK', 'OK'])
@@ -15,8 +12,6 @@ export default function App() {
   const speak = (text) => {
     const utter = new SpeechSynthesisUtterance(text)
     utter.lang = 'vi-VN'
-    utter.pitch = 1
-    utter.rate = 1
     speechSynthesis.speak(utter)
   }
 
@@ -50,41 +45,18 @@ export default function App() {
   }, [])
 
   return (
-    <div style={{ display: 'flex' }}>
-      <Canvas style={{ width: '70vw', height: '100vh' }} camera={{ position: [0, 10, 30], fov: 50 }}>
-        <ambientLight />
-        <directionalLight position={[10, 10, 5]} />
-        <OrbitControls />
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[100, 0.5, 1]} />
-          <meshStandardMaterial color='gray' />
-        </mesh>
-        <group position={[-50 + position, 1, 0]}>
-          {status.map((s, i) => (
-            <mesh key={i} position={[i * 3, 0, 0]}>
-              <boxGeometry args={[2.5, 1, 1]} />
-              <meshStandardMaterial
-                color={
-                  s === 'OK' ? 'green' : s.includes('Lỗi') || s.includes('Hỏng') ? 'red' : 'yellow'
-                }
-              />
-            </mesh>
-          ))}
-        </group>
-      </Canvas>
-      <div style={{ padding: 20 }}>
-        <h2>Metro Twin Demo</h2>
-        <p><strong>Tốc độ:</strong> {speed} km/h</p>
-        <p><strong>Ga hiện tại:</strong> {currentStation}</p>
-        <p><strong>Ga kế tiếp:</strong> {nextStation}</p>
-        <h4>Trạng thái kỹ thuật:</h4>
-        <ul>
-          {status.map((s, i) => (
-            <li key={i}>Toa {i + 1}: {s}</li>
-          ))}
-        </ul>
-        <p style={{ marginTop: '2em', fontStyle: 'italic' }}>Powered by Silversea Media</p>
-      </div>
+    <div style={{ padding: 20 }}>
+      <h2>Metro Twin Demo</h2>
+      <p><strong>Tốc độ:</strong> {speed} km/h</p>
+      <p><strong>Ga hiện tại:</strong> {currentStation}</p>
+      <p><strong>Ga kế tiếp:</strong> {nextStation}</p>
+      <h4>Trạng thái kỹ thuật:</h4>
+      <ul>
+        {status.map((s, i) => (
+          <li key={i}>Toa {i + 1}: {s}</li>
+        ))}
+      </ul>
+      <p style={{ marginTop: '2em', fontStyle: 'italic' }}>Powered by Silversea Media</p>
     </div>
   )
 }
